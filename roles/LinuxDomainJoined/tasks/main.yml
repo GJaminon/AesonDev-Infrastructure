@@ -1,0 +1,39 @@
+---
+- name: Get current realm
+  command: /bin/bash -c "/usr/sbin/realm list"
+  register: realm_list_result
+- name: Show current realm
+  debug: 
+     msg: "current realm: {{ realm_list_result.stdout  }}"
+- name: Register to AD
+  expect:
+     command: "/bin/bash -c '/usr/sbin/realm join {{ domain }} --computer-ou='{{ ad_ou }}' --user={{ ad_user }}' "
+     responses: 
+       Password for.*: "{{ ad_password }}"
+  when: realm_list_result.stdout == ""
+- name: Configure Fully Qualified Name usage 
+  lineinfile:
+     dest: /etc/sssd/sssd.conf
+     regexp: '^use_fully_qualified_names'
+     line: 'use_fully_qualified_names = False'
+     state: present 
+  register: fqn_config
+- name: Configure Fallback HomeDir 
+  lineinfile:
+     dest: /etc/sssd/sssd.conf
+     regexp: '^fallback_homedir'
+     line: 'fallback_homedir = /home/%u'
+     state: present 
+  register: fallback_config
+- name: Add LinuxAdmin ADGroup to sudoers
+  copy:
+     dest: /etc/sudoers.d/linuxadmins
+     content: '%LinuxAdmins    ALL=(ALL)       ALL'
+     force: yes
+  register: sudoer_config
+- name: Restart SSSD service
+  service:
+    name: sssd
+    state: restarted
+  when: fqn_config.changed or fallback_config.changed or sudoer_config.changed
+

@@ -1,0 +1,42 @@
+---
+- name: Create VM "{{ hostvars[item]['vm_name'] }}"
+  vmware_guest: 
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    name: "{{ hostvars[item]['vm_name'] }}"
+    state: present
+    template: "{{ hostvars[item]['vm_template_name'] }}"
+    datacenter: "{{ vm_datacenter }}"
+    folder: /
+    hardware:
+       memory_mb: "{{ hostvars[item]['ram_mb'] }}" 
+       num_cpus: "{{ hostvars[item]['cpus'] }}"
+       hotadd_cpu: True
+       hotremove_cpu: True
+       hotadd_memory: True
+    disk:
+      - size_gb: "{{ hostvars[item]['disk_size_gb'] }}"
+        autoselect_datastore: True
+    networks:
+      - name: "{{ hostvars[item]['private_network_name'] }}"
+        ip: "{{ hostvars[item]['private_ip'] }}"
+        netmask: "{{ hostvars[item]['private_ip_netmask'] }}"
+       
+      - name: "{{ hostvars[item]['public_network_name'] }}"
+        ip: "{{ hostvars[item]['public_ip'] }}"
+        netmask: "{{ hostvars[item]['public_ip_netmask'] }}"
+        mac: "{{ hostvars[item]['public_nic_mac'] }}"
+        gateway: "{{ hostvars[item]['public_ip_gateway'] }}"  
+                 
+    customization:
+        hostname: "{{ hostvars[item]['vm_name']|lower }}"
+        dns_servers:
+          - "{{ hostvars[item]['private_ip_dns'] }}"
+          - "{{ hostvars[item]['public_ip_dns'] }}"
+          
+    wait_for_ip_address: yes
+  delegate_to: localhost
+           
+

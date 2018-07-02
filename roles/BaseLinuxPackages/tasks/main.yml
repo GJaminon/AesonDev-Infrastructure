@@ -1,0 +1,56 @@
+---
+- name: Install Epel Release
+  yum:
+    name: epel-release
+    state: latest
+  tags:
+    - BasePackages
+
+- name: Update existing packages
+  yum:
+    name: "*"
+    state: latest
+  tags:
+    - BasePackages
+
+- name: Add Base Packages
+  yum: 
+    name: "{{ yumPackageName }}"
+    state: latest
+  with_items:
+        - yum-plugin-versionlock
+        - sssd
+        - realmd
+        - oddjob
+        - oddjob-mkhomedir
+        - adcli
+        - samba-common 
+        - samba-common-tools 
+        - krb5-workstation 
+        - openldap-clients 
+        - policycoreutils-python 
+        - htop
+        - python-pip
+
+  loop_control:
+    loop_var: yumPackageName
+  tags:
+    - BasePackages
+
+- name: Update all packages
+  yum:
+    name: "*"
+    state: latest
+  tags:
+    - BasePackages
+
+- name: add Python Packages
+  pip: 
+    name: "{{ pythonPackageName }}"
+    state: present
+  with_items:
+      - pexpect
+  loop_control:
+    loop_var: pythonPackageName
+  tags:
+    - BasePackages

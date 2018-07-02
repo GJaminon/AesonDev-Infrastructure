@@ -1,0 +1,33 @@
+---
+- name: Create Jenkins VMs
+  hosts: localhost
+  connection: local
+  tasks: 
+     - name: Apply DevOpsVm Role
+       include_role:
+          name: LinuxDevOpsVM
+       with_items: "{{ groups['jenkins_servers'] }}" 
+
+- name: Install Base Package on Jenkins VMs
+  hosts: jenkins_servers
+  become: yes
+  tasks:
+    - name: Install Linux packages
+      include_role:
+          name: BaseLinuxPackages  
+
+- name: Join AD Domain
+  hosts: jenkins_servers
+  become: yes
+  tasks:
+     - name: Join Jenkins VM to AD Domain
+       include_role:
+          name: LinuxDomainJoined
+
+- name: Install Jenkins
+  hosts: jenkins_servers
+  become: yes
+  tasks:
+     - name: Install Jenkins
+       include_role:
+          name: Jenkins
