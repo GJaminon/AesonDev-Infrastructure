@@ -25,8 +25,16 @@
   yum:
     name: jenkins
     state: latest
+- name: Open port 8080/tcp
+  firewalld:
+      port: 8080/tcp
+      permanent: true
+      state: enabled
+      zone: public
+      immediate: yes
 - name: Start Jenkins
   service:
     name: jenkins
     state: started
     enabled: yes
+   
