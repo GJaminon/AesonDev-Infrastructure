@@ -1,46 +1,39 @@
 ---
-- name: Create Jenkins VMs
+- name: Create LinuxDevOps VMs
   hosts: localhost
   connection: local
+  tags:
+    - VM
+    - LinuxDevOpsVM
   tasks: 
      - name: Apply DevOpsVm Role
        include_role:
           name: LinuxDevOpsVM
-       with_items: "{{ groups['jenkins_servers'] }}" 
+       with_items: "{{ groups['linux_devops'] }}" 
 
-- name: Install Base Package on Jenkins VMs
-  hosts: jenkins_servers
+- name: Install Base Package on linux VMs
+  hosts: linux_hosts
   become: yes
+  tags:
+    - BaseLinuxPackages
   tasks:
     - name: Install Linux packages
       include_role:
           name: BaseLinuxPackages  
 
-- name: Join AD Domain
-  hosts: jenkins_servers
+- name: Apply roles to linuxdevops
+  hosts: linux_devops
   become: yes
-  tasks:
-     - name: Join Jenkins VM to AD Domain
-       include_role:
-          name: LinuxDomainJoined
+  roles:
+     - role:  LinuxDomainJoined
+       tags: ['DomainJoin']
 
-- name: Install Jenkins
-  hosts: jenkins_servers
-  become: yes
-  tasks:
-     - name: Install Jenkins
-       include_role:
-          name: Jenkins
+     - role: Docker
+       tags: ['Docker']
 
-- name: install Docker
-  hosts: jenkins_servers
-  become: yes
-  tags:
-    - docker
-  tasks:
-    - name: Install Docker
-      include_role: 
-           name: Docker
+     - role: Jenkins
+       tags: ['Jenkins']
+     
 
 
 

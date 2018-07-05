@@ -1,5 +1,5 @@
 ---
-- name: Install Docker prequierments
+- name: Install Docker yum  prequierments
   yum:
     name: "{{ item }}"
     state: latest
@@ -7,6 +7,11 @@
     - yum-utils
     - lvm2
     - device-mapper-persistent-data
+
+- name: Install Docker pip prerequierments
+  pip: 
+    name: docker-py
+    state: latest
 
 - name: Add Docker GPG key.
   rpm_key:
@@ -44,3 +49,9 @@
     name: ansible
     groups: docker
     append: yes
+
+- name: Start Docker hello world
+  docker_container:
+    name: hello-world
+    image: hello-world
+    state: started

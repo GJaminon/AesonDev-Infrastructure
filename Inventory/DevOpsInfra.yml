@@ -18,12 +18,13 @@ all:
      public_ip_gateway: 54.37.85.254 
      ad_user: ansible-domain
      ad_password: DevOpsCloud123%      
+
 linux_hosts:
          vars:
            ansible_sudo_pass: DevOpsCloud123%
            ad_ou: "OU=LinuxServers,DC={{ domain_name }},DC={{ domain_ext }}"     
          children:
-           jenkins_servers:
+           linux_devops:
 
 windows_hosts:
          vars: 
@@ -31,8 +32,13 @@ windows_hosts:
            ansible_winrm_transport: basic
            ansible_winrm_server_cert_validation: ignore
 
+linux_devops:
+        children:
+           linuxdevops01:
 
-jenkins_servers:
+
+                   
+linuxdevops01:
         vars: 
            vm_template_name: LinuxTemplateVM
            cpus: 2
