@@ -34,7 +34,8 @@
      - role: Jenkins
        tags: ['Jenkins']
      
-
+     - role: Nexus-docker
+       tags: ['Nexus']  
 
 
 
