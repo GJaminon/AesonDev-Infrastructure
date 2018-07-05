@@ -1,0 +1,46 @@
+---
+- name: Install Docker prequierments
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - yum-utils
+    - lvm2
+    - device-mapper-persistent-data
+
+- name: Add Docker GPG key.
+  rpm_key:
+    key: https://download.docker.com/linux/centos/gpg
+    state: present
+
+- name: Add Docker repository.
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: '/etc/yum.repos.d/docker-ce.repo'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Configure Docker Edge repo.
+  ini_file:
+    dest: '/etc/yum.repos.d/docker-ce.repo'
+    section: 'docker-ce-edge'
+    option: enabled
+    value: 1
+
+- name: Install Docker
+  yum:
+    name: docker-ce
+    state: latest
+
+- name: Enable and Start Docker engine
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add ansible user to Doker Admin group
+  user:
+    name: ansible
+    groups: docker
+    append: yes
