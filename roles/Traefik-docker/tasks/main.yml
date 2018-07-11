@@ -1,0 +1,29 @@
+---
+- name: Create Docker config folder
+  file:
+    path: /etc/docker/app_configs/traefik
+    state: directory
+
+- name: Copy config file
+  template:
+    src: traefik.toml.j2
+    dest: /etc/docker/app_configs/traefik/traefik.toml
+
+- name: Create Trafiek volume
+  docker_volume: 
+     name: traefik-data
+
+- name: Create Traefik Container
+  docker_container:
+    name: traefik
+    image: traefik
+    state: started
+    volumes:
+      - "/etc/docker/app_configs/traefik/traefik.toml:/traefik.toml"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports: 
+      - "80:80"
+      - "8080:8080"
+    labels:
+      'traefik.frontend.rule' : "Host:traefik.{{ domain_name }}.int"
+      'traefik.port' : '8080'

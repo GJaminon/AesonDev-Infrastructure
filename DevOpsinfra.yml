@@ -11,6 +11,19 @@
           name: LinuxDevOpsVM
        with_items: "{{ groups['linux_devops'] }}" 
 
+- name: Create Storage VMs
+  hosts: localhost
+  connection: local
+  tags:
+    - VM
+    - Storage
+  tasks: 
+     - name: Apply DevOpsVm Role
+       include_role:
+          name: LinuxDevOpsVM
+       with_items: "{{ groups['linux_storage'] }}" 
+
+
 - name: Install Base Package on linux VMs
   hosts: linux_hosts
   become: yes
@@ -31,14 +44,22 @@
      - role: Docker
        tags: ['Docker']
 
-     - role: Jenkins
+     - role: Jenkins-docker
        tags: ['Jenkins']
      
      - role: Nexus-docker
        tags: ['Nexus']  
 
+     - role: Traefik-docker
+       tags: ['Traefik']
 
+- name: Apply roles to Storage VM
+  hosts: linux_storage
+  become: yes
+  roles:
+     - role: LinuxDomainJoined
+       tags: ['DomainJoined']
 
-
+     
 
 

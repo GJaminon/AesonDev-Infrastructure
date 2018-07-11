@@ -1,0 +1,20 @@
+---
+- name: Create the Docker Volume
+  docker_volume:
+    name: jenkins-data
+
+
+- name: Create Jenkins container
+  docker_container:
+    name: jenkins
+    image: jenkinsci/blueocean
+    state: started
+    volumes:
+      - "jenkins-data:/var/jenkins_home"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      'traefik.backend' :  'jenkins'
+      'traefik.frontend' :  "Host:jenkins.{{ domain_name }}.int"
+      'traefik.docker.network' :  'bridge'
+      'traefik.port' :  '8080'
+      'traefik.enable' : 'true' 

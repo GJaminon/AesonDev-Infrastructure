@@ -21,10 +21,12 @@ all:
 
 linux_hosts:
          vars:
+           ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
            ansible_sudo_pass: DevOpsCloud123%
            ad_ou: "OU=LinuxServers,DC={{ domain_name }},DC={{ domain_ext }}"     
          children:
            linux_devops:
+           linux_storage:
 
 windows_hosts:
          vars: 
@@ -51,6 +53,22 @@ linuxdevops01:
                  public_ip: 51.255.31.149
                  public_nic_mac: 00:50:56:06:21:59
                  
+
+linux_storage:
+        vars:
+           vm_template_name: LinuxTemplateVM
+           cpus: 2
+           ram_mb: 2000
+           disk_size_gb: 17
+        hosts: 
+           10.0.0.6:
+                 vm_name: NFS01
+                 private_ip: 10.0.0.6
+                 public_ip: 51.255.31.150
+                 public_nic_mac: 00:50:56:08:89:cc 
+
+
+
 
 
 

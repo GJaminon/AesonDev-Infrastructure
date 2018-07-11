@@ -50,8 +50,4 @@
     groups: docker
     append: yes
 
-- name: Start Docker hello world
-  docker_container:
-    name: hello-world
-    image: hello-world
-    state: started
+
